@@ -1,4 +1,4 @@
-import {Suspense} from 'react';
+import {Suspense, useEffect, useState} from 'react';
 import {Await, NavLink, useAsyncValue} from 'react-router';
 import {useAnalytics, useOptimisticCart} from '@shopify/hydrogen';
 import {useAside} from '~/components/Aside';
@@ -8,21 +8,59 @@ import {useAside} from '~/components/Aside';
  */
 export function Header({header, isLoggedIn, cart, publicStoreDomain}) {
   const {shop, menu} = header;
-  return (
-    <header className="header">
-      <NavLink prefetch="intent" to="/" style={activeLinkStyle} end>
-        {/* <strong>{shop.name}</strong> */}
-        <strong>Shop Mart</strong>
-      </NavLink>
-      <HeaderMenu
-        menu={menu}
-        viewport="desktop"
-        primaryDomainUrl={header.shop.primaryDomain.url}
-        publicStoreDomain={publicStoreDomain}
-      />
-      <HeaderCtas isLoggedIn={isLoggedIn} cart={cart} />
-    </header>
-  );
+   
+  const [isScrolled, setIsScrolled]=useState(false);
+  const [isScrollingUp, setIsScrollingUp]=useState(false);
+  const [lastScrollY, setLastScrolly]=useState(0);
+  const {type: asideType}= useAside();
+
+  useEffect(()=>{
+       const root = document.documentElement;
+
+       root.style.setProperty('--announcement-height', isScrolled ? '0px' : '40px')
+       root.style.setProperty('--header-height', isScrolled?'64px':'80px')
+
+       const handleScroll =(e)=>{
+        if(asideType !== 'closed') return
+         e.preventDefault();
+        const currentScrolly=window.scrollY;
+
+        setIsScrollingUp( currentScrolly < lastScrollY);
+        setLastScrolly(currentScrolly);
+
+        setIsScrolled(currentScrolly > 50)
+       
+       }
+
+       window.addEventListener('scroll', handleScroll, {passive:true})
+
+       return ()=> window.removeEventListener('scroll', handleScroll)
+  },[lastScrollY, isScrolled, asideType])
+
+   return(
+    <div className={`fixed w-full z-40 transition-transform duration-500 ease-in-out ${!isScrollingUp && isScrolled && asideType === 'closed' ? 'translate-y-full' : 'translate-y-0'}`}>
+      {/* Announcement Bar */}
+
+      <div className={`overflow-hidden transition-all duration-500 ease-in-out bg-teal-300 ${isScrolled ? 'max-h-0' : 'max-h-12'}`}>
+        <div className='container mx-auto text-center py-2.5 px-4 '>
+          <p className='leading-tight text-[.8rem] font-serif sm:text-sm font-light tracking-wider'>Complimentary Shipping On Orders Above $500</p>
+        </div>
+      </div>
+
+      {/* Main Head */}
+
+      <header className={`transition-all duration-500 ease-in-out border-b ${isScrolled ? 'bg-white/80 backdrop-blur-lg shadow-sm border-transparent' : ' bg-white border-gray-100'}`}>
+         <div className='container mx-auto'>
+           {/* Mobile device 550px below */}
+           <div className={`hidden max-[550px]:block text-center border-b border-gray-100 transition-all duration-300 ease-in-out ${isScrolled ? 'py-1': 'py-2'}`}>
+             <NavLink prefetch='intent' to='/' className='text-2xl tracking-normal inline-block'>
+                  <h1 className='font-medium my-0'>Shop Mart</h1>
+             </NavLink>
+           </div>
+         </div>
+      </header>
+    </div>
+   )
 }
 
 /**
