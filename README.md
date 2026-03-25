@@ -43,3 +43,21 @@ npm run dev
 ## Setup for using Customer Account API (`/account` section)
 
 Follow step 1 and 2 of <https://shopify.dev/docs/custom-storefronts/building-with-the-customer-account-api/hydrogen#step-1-set-up-a-public-domain-for-local-development>
+
+
+## Genarate SESSION_SECRET 
+
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
+## Need for setup .env
+
+SESSION_SECRET=
+
+PUBLIC_STORE_DOMAIN=
+PUBLIC_STOREFRONT_ID=
+
+PUBLIC_STOREFRONT_API_TOKEN=
+PRIVATE_STOREFRONT_API_TOKEN=
+
+PUBLIC_CUSTOMER_ACCOUNT_API_CLIENT_ID=
+PUBLIC_CUSTOMER_ACCOUNT_API_URL=
