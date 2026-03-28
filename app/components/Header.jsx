@@ -2,6 +2,7 @@ import {Suspense, useEffect, useState} from 'react';
 import {Await, NavLink, useAsyncValue} from 'react-router';
 import {useAnalytics, useOptimisticCart} from '@shopify/hydrogen';
 import {useAside} from '~/components/Aside';
+import { Menu } from 'lucide-react';
 
 /**
  * @param {HeaderProps}
@@ -57,6 +58,27 @@ export function Header({header, isLoggedIn, cart, publicStoreDomain}) {
                   <h1 className='font-medium my-0'>Shop Mart</h1>
              </NavLink>
            </div>
+
+           {/* Header Content */}
+            <div className={`flex items-center justify-between px-6 sm:px-4 transition-all duration-300 ease-in-out ${isScrolled ? 'py-3 sm:py-4' : ''}`}>
+                  {/* Mobile Menu Toggle */}
+                  <div className='lg:hidden'>
+                      <HeaderMenuMobileToggle/>
+                  </div>
+
+                  {/* Logo (Above 550px) */}
+
+                  <NavLink prefetch='intent' to='/' className={` tracking-wider text-center max-[550px]:hidden absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 lg:text-left transition-all duration-300 ease-in-ou ${isScrolled ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-[28px]'}`}>
+                  <h1 className='font-medium'>Shop Mart</h1>
+                  </NavLink>
+                  {/* Desktop Navigation */}
+
+                  <div className='hidden lg:block flex-1 px-12'>
+                   <HeaderMenu menu={menu} viewport='desktop' primaryDomainUrl={header.shop.primaryDomain.url} publicStoreDomain={publicStoreDomain}/>
+                  </div>
+            </div>
+
+
          </div>
       </header>
     </div>
@@ -145,10 +167,10 @@ function HeaderMenuMobileToggle() {
   const {open} = useAside();
   return (
     <button
-      className="header-menu-mobile-toggle reset"
+      className="p-2 -ml-2 hover:text-yellow-600 transition-colors duration-200"
       onClick={() => open('mobile')}
     >
-      <h3>☰</h3>
+      <Menu className='h-6 w-6'/>
     </button>
   );
 }
